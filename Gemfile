@@ -28,6 +28,12 @@ gem 'jbuilder', '~> 2.7'
 # Reduces boot times through caching; required in config/boot.rb
 gem 'bootsnap', '>= 1.4.2', require: false
 
+# Official React community gem for integrating React with Rails
+# Provides a component generator to automatically create a basic
+# component by passing it a component name and props(with their proptypes)
+# Ex: rails g react:component HelloWorld greeting:string
+gem 'react-rails'
+
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
