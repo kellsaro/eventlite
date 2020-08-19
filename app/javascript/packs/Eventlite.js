@@ -4,6 +4,7 @@ import axios from 'axios';
 
 import EventsList from './EventsList';
 import EventForm from './EventForm';
+import FormErrors from './FormErrors';
 
 class Eventlite extends React.Component {
   constructor(props){
@@ -13,13 +14,15 @@ class Eventlite extends React.Component {
       events: this.props.events,
       title: '',
       start_datetime: '',
-      location: ''
+      location: '',
+      formErrors: {}
     };
   }
 
   render() {
-    return ( 
+    return (
       <div>
+        <FormErrors formErrors={this.state.formErrors} />
         <EventForm
           handleSubmit={this.handleSubmit}
           handleInput={this.handleInput}
@@ -31,14 +34,6 @@ class Eventlite extends React.Component {
       </div>
     )
   }
-
-  addNewEvent = (event) => {
-    const events = [event, ...this.state.events].sort((a, b) => (
-      new Date(b.start_datetime) - new Date(a.start_datetime)
-    ));
-
-    this.setState({ events: events});
-  } 
 
   handleInput = (e) => {
     e.preventDefault();
@@ -67,12 +62,30 @@ class Eventlite extends React.Component {
       }
     })
     .then(response => {
-      this.addNewEvent(response.data);
+      this.addNewEvent(response.data)
+      this.resetInputFields()
+      this.resetFormErrors()
     })
     .catch(error => {
-      console.log(error);
+      this.addErrorMessages(error.response.data)
     })
   }
+
+  addNewEvent = (event) => {
+    const events = [event, ...this.state.events].sort((a, b) => (
+      new Date(b.start_datetime) - new Date(a.start_datetime)
+    ));
+
+    this.setState({ events: events });
+  }
+ 
+  addErrorMessages = (errorMessages) => {
+    this.setState({ formErrors: errorMessages });
+  }
+
+  resetInputFields = () => this.setState({title: '', start_datetime: '', location: ''})
+
+  resetFormErrors = () => this.setState({formErrors: {}})
 }
 
 document.addEventListener('DOMContentLoaded', () => {
