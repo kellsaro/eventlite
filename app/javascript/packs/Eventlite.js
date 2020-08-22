@@ -1,10 +1,11 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import axios from 'axios';
+import React from 'react'
+import ReactDOM from 'react-dom'
+import axios from 'axios'
 
-import EventsList from './EventsList';
-import EventForm from './EventForm';
-import FormErrors from './FormErrors';
+import EventsList from './EventsList'
+import EventForm from './EventForm'
+import FormErrors from './FormErrors'
+import validations from './util/validations'
 
 class Eventlite extends React.Component {
   constructor(props){
@@ -12,12 +13,25 @@ class Eventlite extends React.Component {
 
     this.state = {
       events: this.props.events,
-      title: '',
-      start_datetime: '',
-      location: '',
+      title: { value: '', valid: false },
+      start_datetime: { value: '', valid: false },
+      location: { value: '', valid: false },
       formErrors: {},
       formValid: false
     };
+  }
+
+  static formValidations = {
+    title: [
+      (value) => ( validations.checkMinLength(value, 3))
+    ],
+    start_datetime: [
+      (value) => ( validations.checkMinLength(value, 1)),
+      (value) => ( validations.timeShouldBeInTheFuture(value))
+    ],
+    location: [
+      (value) => ( validations.checkMinLength(value, 1))
+    ]
   }
 
   render() {
@@ -27,9 +41,9 @@ class Eventlite extends React.Component {
         <EventForm
           handleSubmit={this.handleSubmit}
           handleInput={this.handleInput}
-          title={this.state.title}
-          start_datetime={this.state.start_datetime}
-          location={this.state.location}
+          title={this.state.title.value}
+          start_datetime={this.state.start_datetime.value}
+          location={this.state.location.value}
           formValid={this.state.formValid} />
 
         <EventsList events={this.state.events} />
@@ -40,19 +54,37 @@ class Eventlite extends React.Component {
   handleInput = (e) => {
     e.preventDefault();
 
-    const name = e.target.name;
-    const newState = {};
-    newState[name] = e.target.value;
-    this.setState(newState, this.validateForm);
+    const name = e.target.name
+    const value = e.target.value
+    const newState = {}
+    newState[name] = { ...this.state[name], value: value }
+    this.setState(newState, () => this.validateField(name, value, Eventlite.formValidations[name]))
+  }
+
+  validateField = (fieldName, fieldValue, fieldValidations) => {
+    let fieldValid = true
+    let errors = fieldValidations.reduce((errors, validation) => {
+      let [valid, fieldError] = validation(fieldValue)
+      if (!valid) {
+        errors = errors.concat([fieldError])
+      }
+      return errors
+    }, [])
+    
+    fieldValid = errors.length === 0
+
+    const newState = { formErrors: {...this.state.formErrors, [fieldName]: errors }}
+    newState[fieldName] = {...this.state[fieldName], valid: fieldValid }
+    this.setState(newState, this.validateForm)
   }
 
   handleSubmit = (e) => {
     e.preventDefault();
 
     let newEvent = {
-      title: this.state.title,
-      start_datetime: this.state.start_datetime,
-      location: this.state.location
+      title: this.state.title.value,
+      start_datetime: this.state.start_datetime.value,
+      location: this.state.location.value
     };
 
     axios({
@@ -89,31 +121,11 @@ class Eventlite extends React.Component {
 
   resetFormErrors = () => this.setState({formErrors: {}})
 
-  validateForm = () => {
-    let formErrors = {}
-    let formValid = true
-
-    if (this.state.title.length <= 2) {
-      formErrors.title = ['is too short (minimum is 3 characters)']
-      formValid = false
-    }
-
-    if (this.state.location.length === 0) {
-      formErrors.location = ["can't be blank"]
-      formValid = false
-    }
-
-    if (this.state.start_datetime.length === 0) {
-      formErrors.start_datetime = ["can't be blank"]
-      formValid = false
-    }
-    else if (Date.parse(this.state.start_datetime) <= Date.now()) {
-      formErrors.start_datetime = ["can't be in the past"]
-      formValid = false
-    }
-
-    this.setState({ formValid: formValid, formErrors: formErrors })
-  }
+  validateForm = () => this.setState({
+    formValid: this.state.title.valid &&
+               this.state.location.valid &&
+               this.state.start_datetime.valid 
+  })
 }
 
 document.addEventListener('DOMContentLoaded', () => {
