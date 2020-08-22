@@ -9,7 +9,7 @@ import FormErrors from './FormErrors'
 
 class Eventlite extends React.Component {
   constructor(props){
-    super(props);
+    super(props)
 
     this.state = {
       events: this.props.events,
@@ -18,25 +18,25 @@ class Eventlite extends React.Component {
       location: '',
       formErrors: {},
       formValid: false
-    };
+    }
+
+    this.logo = React.createRef()
   }
 
-  render() {
-    return (
-      <div>
-        <FormErrors formErrors={this.state.formErrors} />
-        <EventForm
-          handleSubmit={this.handleSubmit}
-          handleInput={this.handleInput}
-          title={this.state.title}
-          start_datetime={this.state.start_datetime}
-          location={this.state.location}
-          formValid={this.state.formValid} />
+  render = () => 
+    <div>
+      <h1 className='logo' ref={this.logo}>Eventlite</h1>
+      <FormErrors formErrors={this.state.formErrors} />
+      <EventForm
+        handleSubmit={this.handleSubmit}
+        handleInput={this.handleInput}
+        title={this.state.title}
+        start_datetime={this.state.start_datetime}
+        location={this.state.location}
+        formValid={this.state.formValid} />
 
-        <EventsList events={this.state.events} />
-      </div>
-    )
-  }
+      <EventsList events={this.state.events} />
+    </div>
 
   handleInput = (e) => {
     e.preventDefault();
@@ -79,7 +79,7 @@ class Eventlite extends React.Component {
       new Date(b.start_datetime) - new Date(a.start_datetime)
     ));
 
-    this.setState({ events: events });
+    this.setState({ events: events }, this.changeLogoColour);
   }
  
   addErrorMessages = (errorMessages) => {
@@ -114,6 +114,11 @@ class Eventlite extends React.Component {
     }
 
     this.setState({ formValid: formValid, formErrors: formErrors })
+  }
+
+  changeLogoColour = () => {
+    const colors = ['red', 'blue', 'green', 'violet']
+    this.logo.current.style.color = colors[Math.floor(Math.random() * colors.length)]
   }
 }
 
