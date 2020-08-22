@@ -10,7 +10,7 @@ import validations from './util/validations'
 
 class Eventlite extends React.Component {
   constructor(props){
-    super(props);
+    super(props)
 
     this.state = {
       events: this.props.events,
@@ -19,7 +19,8 @@ class Eventlite extends React.Component {
       location: { value: '', valid: false },
       formErrors: {},
       formValid: false
-    };
+    } 
+    this.logo = React.createRef()
   }
 
   static formValidations = {
@@ -35,22 +36,20 @@ class Eventlite extends React.Component {
     ]
   }
 
-  render() {
-    return (
-      <div>
-        <FormErrors formErrors={this.state.formErrors} />
-        <EventForm
-          handleSubmit={this.handleSubmit}
-          handleInput={this.handleInput}
-          title={this.state.title.value}
-          start_datetime={this.state.start_datetime.value}
-          location={this.state.location.value}
-          formValid={this.state.formValid} />
+  render = () => 
+    <div>
+      <h1 className='logo' ref={this.logo}>Eventlite</h1>
+      <FormErrors formErrors={this.state.formErrors} />
+      <EventForm
+        handleSubmit={this.handleSubmit}
+        handleInput={this.handleInput}
+        title={this.state.title.value}
+        start_datetime={this.state.start_datetime.value}
+        location={this.state.location.value}
+        formValid={this.state.formValid} />
 
-        <EventsList events={this.state.events} />
-      </div>
-    )
-  }
+      <EventsList events={this.state.events} />
+    </div>
 
   handleInput = (e) => {
     e.preventDefault();
@@ -111,7 +110,7 @@ class Eventlite extends React.Component {
       new Date(b.start_datetime) - new Date(a.start_datetime)
     ));
 
-    this.setState({ events: events });
+    this.setState({ events: events }, this.changeLogoColour);
   }
  
   addErrorMessages = (errorMessages) => {
@@ -122,11 +121,36 @@ class Eventlite extends React.Component {
 
   resetFormErrors = () => this.setState({formErrors: {}})
 
-  validateForm = () => this.setState({
-    formValid: this.state.title.valid &&
-               this.state.location.valid &&
-               this.state.start_datetime.valid 
-  })
+  validateForm = () => {
+    let formErrors = {}
+    let formValid = true
+
+    if (this.state.title.length <= 2) {
+      formErrors.title = ['is too short (minimum is 3 characters)']
+      formValid = false
+    }
+
+    if (this.state.location.length === 0) {
+      formErrors.location = ["can't be blank"]
+      formValid = false
+    }
+
+    if (this.state.start_datetime.length === 0) {
+      formErrors.start_datetime = ["can't be blank"]
+      formValid = false
+    }
+    else if (Date.parse(this.state.start_datetime) <= Date.now()) {
+      formErrors.start_datetime = ["can't be in the past"]
+      formValid = false
+    }
+
+    this.setState({ formValid: formValid, formErrors: formErrors })
+  }
+
+  changeLogoColour = () => {
+    const colors = ['red', 'blue', 'green', 'violet']
+    this.logo.current.style.color = colors[Math.floor(Math.random() * colors.length)]
+  }
 }
 
 Eventlite.propTypes = {
