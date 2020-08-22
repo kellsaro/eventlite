@@ -1,7 +1,9 @@
-import React from 'react';
-import Event from './Event';
+import React from 'react'
+import PropTypes from 'prop-types'
 
-const EventsList = props => (
+import Event from './Event'
+
+const EventsList = props =>
   <div>
     {
       props.events.map((event) => (
@@ -9,6 +11,9 @@ const EventsList = props => (
       ))
     }
   </div>
-);
+
+EventsList.propTypes = {
+  events: PropTypes.array.isRequired
+}
 
 export default EventsList;

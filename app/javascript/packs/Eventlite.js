@@ -1,10 +1,11 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import axios from 'axios';
+import React from 'react'
+import ReactDOM from 'react-dom'
+import PropTypes from 'prop-types'
+import axios from 'axios'
 
-import EventsList from './EventsList';
-import EventForm from './EventForm';
-import FormErrors from './FormErrors';
+import EventsList from './EventsList'
+import EventForm from './EventForm'
+import FormErrors from './FormErrors'
 
 class Eventlite extends React.Component {
   constructor(props){
@@ -114,6 +115,10 @@ class Eventlite extends React.Component {
 
     this.setState({ formValid: formValid, formErrors: formErrors })
   }
+}
+
+Eventlite.propTypes = {
+  events: PropTypes.array.isRequired
 }
 
 document.addEventListener('DOMContentLoaded', () => {
