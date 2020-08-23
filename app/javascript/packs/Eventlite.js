@@ -122,29 +122,9 @@ class Eventlite extends React.Component {
   resetFormErrors = () => this.setState({formErrors: {}})
 
   validateForm = () => {
-    let formErrors = {}
-    let formValid = true
-
-    if (this.state.title.length <= 2) {
-      formErrors.title = ['is too short (minimum is 3 characters)']
-      formValid = false
-    }
-
-    if (this.state.location.length === 0) {
-      formErrors.location = ["can't be blank"]
-      formValid = false
-    }
-
-    if (this.state.start_datetime.length === 0) {
-      formErrors.start_datetime = ["can't be blank"]
-      formValid = false
-    }
-    else if (Date.parse(this.state.start_datetime) <= Date.now()) {
-      formErrors.start_datetime = ["can't be in the past"]
-      formValid = false
-    }
-
-    this.setState({ formValid: formValid, formErrors: formErrors })
+    this.setState({ formValid: this.state.title.valid &&
+                               this.state.location.valid &&
+                               this.state.start_datetime.valid })
   }
 
   changeLogoColour = () => {

@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-const EventForm = (props) => (
+const EventForm = (props) =>
   <div>
     <h4>Create Event:</h4>
 
@@ -22,7 +22,6 @@ const EventForm = (props) => (
         disabled={!props.formValid}/>
     </form>
   </div>
-)
 
 EventForm.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
